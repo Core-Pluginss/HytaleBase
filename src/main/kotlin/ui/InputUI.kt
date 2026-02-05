@@ -1,0 +1,100 @@
+﻿package core.tastycake.ui
+
+import au.ellie.hyui.builders.*
+import au.ellie.hyui.elements.LayoutModeSupported
+import com.hypixel.hytale.component.Store
+import com.hypixel.hytale.protocol.packets.interface_.CustomPageLifetime
+import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType
+import com.hypixel.hytale.server.core.entity.entities.Player
+import com.hypixel.hytale.server.core.entity.entities.player.pages.InteractiveCustomUIPage
+import com.hypixel.hytale.server.core.universe.PlayerRef
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore
+import core.tastycake.ui.runnables.InputCallback
+import core.tastycake.ui.runnables.InputResult
+
+/**
+ * @author TastyCake
+ * @date 1/27/2026
+ */
+
+class InputUI(
+    val playerRef: PlayerRef,
+    val store: Store<EntityStore>
+) {
+    var currentInput: String = ""
+
+    fun open(request: String = "", backMenu: InteractiveCustomUIPage<*>? = null, callback: InputCallback) {
+        val text = request.ifEmpty { "Please enter your input" }
+
+        val pageBuilder = PageBuilder
+            .pageForPlayer(playerRef)
+            .withLifetime(CustomPageLifetime.CantClose)
+            .addElement(
+                ContainerBuilder.container()
+                    .withTitleText("Input request")
+                    .withAnchor(HyUIAnchor().setWidth(500).setHeight(250))
+                    .addContentChild(
+                        GroupBuilder.group()
+                            .withLayoutMode(LayoutModeSupported.LayoutMode.Top)
+                            .addChild(
+                                LabelBuilder.label()
+                                    .withText(text)
+                                    .withStyle(
+                                        HyUIStyle()
+                                            .setRenderBold(true)
+                                            .setAlignment(HyUIStyle.Alignment.Center)
+                                    )
+                                    .withPadding(HyUIPadding(10, 10, 20, 10))
+                            )
+                            .addChild(
+                                TextFieldBuilder.textInput()
+                                    .withAnchor(HyUIAnchor().setWidth(350).setHeight(40).setBottom(35))
+                                    .withPadding(HyUIPadding(10, 10, 20, 10))
+                                    .addEventListener(CustomUIEventBindingType.ValueChanged, String::class.java) { v ->
+                                        currentInput = v
+                                    }
+                            )
+                            .addChild(
+                                GroupBuilder.group()
+                                    .withFlexWeight(1)
+                                    .withLayoutMode(LayoutModeSupported.LayoutMode.Left)
+                                    .withPadding(HyUIPadding(10, 10, 10, 10))
+                                    .withStyle(
+                                        HyUIStyle()
+                                            .setAlignment(HyUIStyle.Alignment.Center)
+                                    )
+                                    .addChild(
+                                        ButtonBuilder.textButton()
+                                            .withAnchor(HyUIAnchor().setWidth(150).setHeight(40).setRight(20))
+                                            .withText("DONE")
+                                            .withPadding(HyUIPadding(0, 5, 0, 0))
+                                            .addEventListener(CustomUIEventBindingType.Activating) { _ ->
+                                                callback.result(currentInput, InputResult.COMPLETED)
+                                                goBack(backMenu)
+                                            }
+                                    )
+                                    .addChild(
+                                        ButtonBuilder.cancelTextButton()
+                                            .withAnchor(HyUIAnchor().setWidth(150).setHeight(40))
+                                            .withText("CANCEL")
+                                            .withPadding(HyUIPadding(5, 0, 0, 0))
+                                            .addEventListener(CustomUIEventBindingType.Activating) { _ ->
+                                                callback.result(currentInput, InputResult.CANCELED)
+                                                goBack(backMenu)
+                                            }
+                                    )
+                            )
+                    )
+            )
+
+        pageBuilder.open(store)
+    }
+
+    private fun goBack(page: InteractiveCustomUIPage<*>?) {
+        page?: return
+
+        val player = store.getComponent(playerRef.reference!!, Player.getComponentType())?: return
+
+        player.pageManager.openCustomPage(playerRef.reference!!, store, page)
+    }
+}
