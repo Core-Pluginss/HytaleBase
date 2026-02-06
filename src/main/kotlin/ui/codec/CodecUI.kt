@@ -5,9 +5,6 @@ import au.ellie.hyui.builders.GroupBuilder
 import au.ellie.hyui.builders.HyUIAnchor
 import au.ellie.hyui.builders.PageBuilder
 import au.ellie.hyui.elements.LayoutModeSupported
-import com.hypixel.hytale.codec.Codec
-import com.hypixel.hytale.codec.EmptyExtraInfo
-import com.hypixel.hytale.codec.builder.BuilderCodec
 import com.hypixel.hytale.component.Store
 import com.hypixel.hytale.protocol.packets.interface_.CustomPageLifetime
 import com.hypixel.hytale.server.core.inventory.ItemStack
@@ -15,8 +12,6 @@ import com.hypixel.hytale.server.core.universe.PlayerRef
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore
 import core.tastycake.config.EasyConfig
 import core.tastycake.ui.UIPlayer
-import org.bson.BsonDocument
-import org.bson.BsonValue
 
 /**
  * @author TastyCake

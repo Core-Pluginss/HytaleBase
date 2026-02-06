@@ -15,6 +15,7 @@ import java.util.UUID
 
 class Leaderboard(
     val name: String,
+    val pointsName: String = "Points",
     val config: Config<LeaderboardConfig>
 ) {
     // Required: in main class: withConfig()
@@ -22,9 +23,18 @@ class Leaderboard(
 
     }
 
+    init {
+        var array = config.get()
+            .getOrDefault<Array<LeaderboardPlayer.LeaderboardPlayerConfig>>("Players", emptyArray())
+
+        config.get().set("Players", array)
+
+        config.save()
+    }
+
     fun getOrNew(uuid: UUID, defaultPoints: Int = 0): LeaderboardPlayer.LeaderboardPlayerConfig {
         var array = config.get()
-            .get<Array<LeaderboardPlayer.LeaderboardPlayerConfig>>("Players")!!
+            .getOrDefault<Array<LeaderboardPlayer.LeaderboardPlayerConfig>>("Players", emptyArray())!!
 
         var player = array.firstOrNull { it.get<UUID>("UUID") == uuid }
 
@@ -64,6 +74,12 @@ class Leaderboard(
                 register(this)
 
         return this
+    }
+
+    fun reset() {
+        config.get().set<Array<LeaderboardPlayer.LeaderboardPlayerConfig>>("Players", emptyArray())
+
+        config.save()
     }
 
     companion object {

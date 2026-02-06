@@ -5,18 +5,15 @@ import au.ellie.hyui.builders.GroupBuilder
 import au.ellie.hyui.builders.HyUIAnchor
 import au.ellie.hyui.builders.HyUIPadding
 import au.ellie.hyui.builders.HyUIPatchStyle
-import au.ellie.hyui.builders.HyUIStyle
 import au.ellie.hyui.builders.LabelBuilder
 import au.ellie.hyui.builders.TextFieldBuilder
 import au.ellie.hyui.elements.LayoutModeSupported
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType
-import core.tastycake.config.EasyConfig
 import core.tastycake.ui.ItemInputUI
 import core.tastycake.ui.UIPlayer
 import core.tastycake.ui.runnables.FieldInputCallback
 import core.tastycake.ui.runnables.InputCallback
 import core.tastycake.ui.runnables.InputResult
-import core.tastycake.ui.runnables.InputType
 
 /**
  * @author TastyCake

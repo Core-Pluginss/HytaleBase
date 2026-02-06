@@ -17,6 +17,7 @@ class EasyConfigBuilder<C: EasyConfig>(
     val builder: BuilderCodec.Builder<C>
 ) {
     companion object {
+        @JvmStatic
         inline fun <reified C: EasyConfig> builder(noinline supplier: () -> C): EasyConfigBuilder<C> {
             return EasyConfigBuilder(
                 BuilderCodec.builder<C>(
