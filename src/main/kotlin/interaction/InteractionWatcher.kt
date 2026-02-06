@@ -9,7 +9,7 @@ import com.hypixel.hytale.server.core.io.PacketHandler
 import com.hypixel.hytale.server.core.io.adapter.PacketWatcher
 import com.hypixel.hytale.server.core.io.handlers.game.GamePacketHandler
 import com.hypixel.hytale.server.core.universe.Universe
-import me.tastycake.interaction.registry.InteractionRegistry
+import core.tastycake.interaction.registry.InteractionRegistry
 
 /**
  * @author TastyCake

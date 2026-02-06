@@ -11,7 +11,4 @@ class Field<T>(
     val codec: Codec<T>,
     val type: T,
 ) {
-    fun getCodec(): Codec<T> {
-        return codec
-    }
 }

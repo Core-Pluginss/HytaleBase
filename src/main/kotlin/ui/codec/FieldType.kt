@@ -10,6 +10,7 @@ import au.ellie.hyui.builders.LabelBuilder
 import au.ellie.hyui.builders.TextFieldBuilder
 import au.ellie.hyui.elements.LayoutModeSupported
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType
+import core.tastycake.config.EasyConfig
 import core.tastycake.ui.ItemInputUI
 import core.tastycake.ui.UIPlayer
 import core.tastycake.ui.runnables.FieldInputCallback
@@ -23,10 +24,10 @@ import core.tastycake.ui.runnables.InputType
  */
 
 enum class FieldType(
-    val group: (String, UIPlayer, FieldInputCallback) -> GroupBuilder
+    val group: (String, UIPlayer, FieldInputCallback) -> GroupBuilder,
 ) {
     TEXT(
-        { value, player, callback ->
+        { value, _, callback ->
             GroupBuilder.group()
                 .withLayoutMode(LayoutModeSupported.LayoutMode.Left)
                 .addChild(

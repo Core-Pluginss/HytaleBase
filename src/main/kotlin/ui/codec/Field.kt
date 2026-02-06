@@ -22,7 +22,7 @@ class Field(
     val fieldType: FieldType,
     val setter: (String) -> Unit,
     val getter: () -> String,
-    val update: () -> Unit
+    var update: () -> Unit = {}
 ) {
     fun getGroup(player: UIPlayer): GroupBuilder {
         return GroupBuilder.group()

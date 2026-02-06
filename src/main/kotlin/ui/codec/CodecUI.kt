@@ -13,6 +13,7 @@ import com.hypixel.hytale.protocol.packets.interface_.CustomPageLifetime
 import com.hypixel.hytale.server.core.inventory.ItemStack
 import com.hypixel.hytale.server.core.universe.PlayerRef
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore
+import core.tastycake.config.EasyConfig
 import core.tastycake.ui.UIPlayer
 import org.bson.BsonDocument
 import org.bson.BsonValue
@@ -22,7 +23,7 @@ import org.bson.BsonValue
  * @date 2/5/2026
  */
 
-class CodecUI<T>(
+class CodecUI<T: EasyConfig>(
     val label: String,
     val obj: T,
     val save: () -> Unit = {}
@@ -30,7 +31,36 @@ class CodecUI<T>(
     private val fields = mutableListOf<Field>()
 
     fun addField(field: Field): CodecUI<T> {
+        field.update = save
         fields.add(field)
+
+        return this
+    }
+
+    fun fillFields(): CodecUI<T> {
+        obj.data.forEach { (key, value) ->
+            val type = if (value is ItemStack) FieldType.ITEM else FieldType.TEXT
+            val field = Field(
+                key,
+                type,
+                { value ->
+                    obj.set(key, value)
+                },
+                {
+                    value?.let {
+                        when (it) {
+                            is ItemStack ->
+                                obj.get(key, ItemStack::class.java)?.itemId ?: ""
+
+                            else ->
+                                obj.get(key, it::class.java)?.toString() ?: ""
+                        }
+                    } ?: ""
+                }
+            )
+
+            addField(field)
+        }
 
         return this
     }
