@@ -55,6 +55,7 @@ class ItemInputUI(
         grid.slots.clear()
 
         Item.getAssetMap().assetMap.forEach { (_, item) ->
+            if (item.id.isNotEmpty() && !item.id.contains(currentInput)) return@forEach
             val stack = ItemStack(item.id)
 
             if (!filter(stack)) return@forEach

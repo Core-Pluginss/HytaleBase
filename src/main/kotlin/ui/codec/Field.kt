@@ -6,6 +6,7 @@ import au.ellie.hyui.builders.HyUIPadding
 import au.ellie.hyui.builders.HyUIStyle
 import au.ellie.hyui.builders.LabelBuilder
 import au.ellie.hyui.elements.LayoutModeSupported
+import core.tastycake.ui.UIPlayer
 import core.tastycake.ui.runnables.FieldInputCallback
 import core.tastycake.ui.runnables.InputCallback
 import core.tastycake.ui.runnables.InputResult
@@ -18,10 +19,12 @@ import core.tastycake.ui.runnables.InputType
 
 class Field(
     val key: String,
-    val update: (String) -> Unit,
-    val fieldType: FieldType
+    val fieldType: FieldType,
+    val setter: (String) -> Unit,
+    val getter: () -> String,
+    val update: () -> Unit
 ) {
-    fun getGroup(): GroupBuilder {
+    fun getGroup(player: UIPlayer): GroupBuilder {
         return GroupBuilder.group()
             .withFlexWeight(1)
             .withLayoutMode(LayoutModeSupported.LayoutMode.Left)
@@ -36,11 +39,15 @@ class Field(
                     .withAnchor(HyUIAnchor().setRight(5))
             )
             .addChild(
-                fieldType.group.invoke(object : FieldInputCallback {
-                    override fun input(input: String) {
-                        update.invoke(input)
-                    }
-                })
+                fieldType.group.invoke(getter.invoke(),
+                    player,
+                    object : FieldInputCallback {
+                        override fun input(input: String) {
+                            setter.invoke(input)
+
+                            update.invoke()
+                        }
+                    })
             )
     }
 }
