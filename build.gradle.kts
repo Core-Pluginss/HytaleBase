@@ -18,7 +18,7 @@ repositories {
 }
 
 dependencies {
-    implementation(files("libs/HytaleServer.jar"))
+    compileOnly(files("libs/HytaleServer.jar"))
 
     implementation("curse.maven:hyui-1431415:7567866")
 

@@ -16,8 +16,8 @@ import core.tastycake.ui.runnables.FieldInputCallback
 class Field(
     val key: String,
     val fieldType: FieldType,
-    val setter: (String) -> Unit,
-    val getter: () -> String,
+    val setter: (String, String) -> Unit,
+    val getter: () -> Any,
     var update: () -> Unit = {}
 ) {
     fun getGroup(player: UIPlayer): GroupBuilder {
@@ -38,8 +38,8 @@ class Field(
                 fieldType.group.invoke(getter.invoke(),
                     player,
                     object : FieldInputCallback {
-                        override fun input(input: String) {
-                            setter.invoke(input)
+                        override fun input(input: String, variable: String) {
+                            setter.invoke(input, variable)
 
                             update.invoke()
                         }

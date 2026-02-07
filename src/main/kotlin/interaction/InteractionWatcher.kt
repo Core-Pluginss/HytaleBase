@@ -36,7 +36,7 @@ class InteractionWatcher : PacketWatcher {
         val ref = playerRef.reference ?: return
         val player = store.getComponent(ref, Player.getComponentType()) ?: return
 
-        InteractionRegistry.getRegistrations().sortedBy { it.priority }.forEach { registration ->
+        InteractionRegistry.getRegistrations().sortedByDescending { it.priority }.forEach { registration ->
             if (!registration.filter.invoke(chain)) return
 
             registration.handler.invoke(player, store, chain)

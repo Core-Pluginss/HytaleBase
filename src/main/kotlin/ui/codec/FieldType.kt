@@ -14,6 +14,7 @@ import core.tastycake.ui.UIPlayer
 import core.tastycake.ui.runnables.FieldInputCallback
 import core.tastycake.ui.runnables.InputCallback
 import core.tastycake.ui.runnables.InputResult
+import core.tastycake.utils.Vector3
 
 /**
  * @author TastyCake
@@ -21,7 +22,7 @@ import core.tastycake.ui.runnables.InputResult
  */
 
 enum class FieldType(
-    val group: (String, UIPlayer, FieldInputCallback) -> GroupBuilder,
+    val group: (Any, UIPlayer, FieldInputCallback) -> GroupBuilder,
 ) {
     TEXT(
         { value, _, callback ->
@@ -29,9 +30,9 @@ enum class FieldType(
                 .withLayoutMode(LayoutModeSupported.LayoutMode.Left)
                 .addChild(
                     TextFieldBuilder.textInput()
-                        .withAnchor(HyUIAnchor().setWidth(350).setHeight(40).setBottom(35))
+                        .withAnchor(HyUIAnchor().setWidth(350).setHeight(40))
                         .withPadding(HyUIPadding(10, 10, 20, 10))
-                        .withValue(value)
+                        .withValue(value.toString())
                         .addEventListener(CustomUIEventBindingType.ValueChanged, String::class.java) { v ->
                             callback.input(v.toString())
                         }
@@ -47,7 +48,7 @@ enum class FieldType(
                         .withBackground(HyUIPatchStyle().setColor("#444444"))
                         .addChild(
                             LabelBuilder.label()
-                                .withText(value)
+                                .withText(value.toString())
                         )
                         .withAnchor(HyUIAnchor().setRight(10))
                 )
@@ -71,6 +72,48 @@ enum class FieldType(
                                 )
                         }
                 )
+        }
+    ),
+    VECTOR(
+        { value, player, callback ->
+            try {
+                val vector = value as Vector3
+
+                GroupBuilder.group()
+                    .withLayoutMode(LayoutModeSupported.LayoutMode.Left)
+                    .addChild(
+                        TextFieldBuilder.textInput()
+                            .withPlaceholderText("x")
+                            .withAnchor(HyUIAnchor().setWidth(100).setHeight(40).setRight(5))
+                            .withPadding(HyUIPadding(10, 10, 20, 10))
+                            .withValue(vector.getOrDefault("X", 0.0)!!.toString())
+                            .addEventListener(CustomUIEventBindingType.ValueChanged, String::class.java) { v ->
+                                callback.input(v.toString(), "X")
+                            }
+                    )
+                    .addChild(
+                        TextFieldBuilder.textInput()
+                            .withPlaceholderText("y")
+                            .withAnchor(HyUIAnchor().setWidth(100).setHeight(40))
+                            .withPadding(HyUIPadding(10, 10, 20, 10).setRight(5))
+                            .withValue(vector.getOrDefault("Y", 0.0)!!.toString())
+                            .addEventListener(CustomUIEventBindingType.ValueChanged, String::class.java) { v ->
+                                callback.input(v.toString(), "Y")
+                            }
+                    )
+                    .addChild(
+                        TextFieldBuilder.textInput()
+                            .withPlaceholderText("z")
+                            .withAnchor(HyUIAnchor().setWidth(100).setHeight(40))
+                            .withPadding(HyUIPadding(10, 10, 20, 10))
+                            .withValue(vector.getOrDefault("Z", 0.0)!!.toString())
+                            .addEventListener(CustomUIEventBindingType.ValueChanged, String::class.java) { v ->
+                                callback.input(v.toString(), "Z")
+                            }
+                    )
+            } catch (e: Exception) {
+                GroupBuilder.group()
+            }
         }
     )
 }

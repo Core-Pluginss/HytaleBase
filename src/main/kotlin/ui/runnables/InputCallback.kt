@@ -7,6 +7,7 @@
 
 enum class InputResult {
     COMPLETED,
+    ACCEPTED,
     CANCELED
 }
 
@@ -20,5 +21,5 @@ interface InputCallback {
 }
 
 interface FieldInputCallback {
-    fun input(input: String)
+    fun input(input: String, variable: String = "")
 }

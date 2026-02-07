@@ -3,6 +3,7 @@
 import au.ellie.hyui.builders.ContainerBuilder
 import au.ellie.hyui.builders.GroupBuilder
 import au.ellie.hyui.builders.HyUIAnchor
+import au.ellie.hyui.builders.LabelBuilder
 import au.ellie.hyui.builders.PageBuilder
 import au.ellie.hyui.elements.LayoutModeSupported
 import com.hypixel.hytale.component.Store
@@ -12,6 +13,7 @@ import com.hypixel.hytale.server.core.universe.PlayerRef
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore
 import core.tastycake.config.EasyConfig
 import core.tastycake.ui.UIPlayer
+import core.tastycake.utils.Vector3
 
 /**
  * @author TastyCake
@@ -38,15 +40,21 @@ class CodecUI<T: EasyConfig>(
             val field = Field(
                 key,
                 type,
-                { value ->
-                    obj.set(key, value)
+                { value, variable ->
+
+                    if (variable.isEmpty()) obj.set(key, (obj.getOrDefault(key, value)!!::class.java).cast(value))
+                    else {
+                        val o = obj.get<EasyConfig>(key)
+                        o?.set(variable, (o.getOrDefault(variable, value)!!::class.java).cast(value))
+                    }
                 },
                 {
                     value?.let {
                         when (it) {
                             is ItemStack ->
                                 obj.get(key, ItemStack::class.java)?.itemId ?: ""
-
+                            is Vector3 ->
+                                obj.get(key, Vector3::class.java)?: Vector3()
                             else ->
                                 obj.get(key, it::class.java)?.toString() ?: ""
                         }
@@ -72,7 +80,6 @@ class CodecUI<T: EasyConfig>(
                 ContainerBuilder.container()
                     .withTitleText(label)
                     .withAnchor(HyUIAnchor().setWidth(900).setHeight(600))
-                    .withLayoutMode(LayoutModeSupported.LayoutMode.TopScrolling)
                     .addContentChild(
                         mainGroup
                     )
@@ -82,7 +89,19 @@ class CodecUI<T: EasyConfig>(
 
         fields.forEach {
             mainGroup
-                .addChild(it.getGroup(UIPlayer(playerRef, store, page)))
+                .addChild(
+                    GroupBuilder.group()
+                        .withLayoutMode(LayoutModeSupported.LayoutMode.Left)
+                        .withAnchor(HyUIAnchor().setBottom(20))
+                        .addChild(
+                            LabelBuilder.label()
+                                .withText("${it.key}:")
+                                .withAnchor(HyUIAnchor().setRight(10))
+                        )
+                        .addChild(
+                            it.getGroup(UIPlayer(playerRef, store, page))
+                        )
+                )
         }
 
         page.updatePage(true)

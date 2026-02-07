@@ -2,6 +2,7 @@
 
 import au.ellie.hyui.builders.*
 import au.ellie.hyui.elements.LayoutModeSupported
+import au.ellie.hyui.events.UIContext
 import com.hypixel.hytale.component.Store
 import com.hypixel.hytale.protocol.packets.interface_.CustomPageLifetime
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType
@@ -25,6 +26,12 @@ class InputUI(
 
     fun open(request: String = "", backMenu: InteractiveCustomUIPage<*>? = null, callback: InputCallback) {
         val text = request.ifEmpty { "Please enter your input" }
+
+        val player = UIPlayer(
+            playerRef,
+            store,
+            backMenu,
+        )
 
         val pageBuilder = PageBuilder
             .pageForPlayer(playerRef)
@@ -57,7 +64,7 @@ class InputUI(
                             .addChild(
                                 GroupBuilder.group()
                                     .withFlexWeight(1)
-                                    .withLayoutMode(LayoutModeSupported.LayoutMode.Left)
+                                    .withLayoutMode(LayoutModeSupported.LayoutMode.Center)
                                     .withPadding(HyUIPadding(10, 10, 10, 10))
                                     .withStyle(
                                         HyUIStyle()
@@ -68,9 +75,9 @@ class InputUI(
                                             .withAnchor(HyUIAnchor().setWidth(150).setHeight(40).setRight(20))
                                             .withText("DONE")
                                             .withPadding(HyUIPadding(0, 5, 0, 0))
-                                            .addEventListener(CustomUIEventBindingType.Activating) { _ ->
+                                            .addEventListenerWithContext(CustomUIEventBindingType.Activating, Void::class.java) { _, ctx ->
                                                 callback.result(currentInput, InputResult.COMPLETED)
-                                                goBack(backMenu)
+                                                goBack(player, ctx)
                                             }
                                     )
                                     .addChild(
@@ -78,9 +85,9 @@ class InputUI(
                                             .withAnchor(HyUIAnchor().setWidth(150).setHeight(40))
                                             .withText("CANCEL")
                                             .withPadding(HyUIPadding(5, 0, 0, 0))
-                                            .addEventListener(CustomUIEventBindingType.Activating) { _ ->
+                                            .addEventListenerWithContext(CustomUIEventBindingType.Activating, Void::class.java) { _, ctx ->
                                                 callback.result(currentInput, InputResult.CANCELED)
-                                                goBack(backMenu)
+                                                goBack(player, ctx)
                                             }
                                     )
                             )
@@ -90,11 +97,16 @@ class InputUI(
         pageBuilder.open(store)
     }
 
-    private fun goBack(page: InteractiveCustomUIPage<*>?) {
-        page?: return
+    companion object {
+        fun goBack(uiplayer: UIPlayer, ctx: UIContext) {
+            if (uiplayer.lastUI == null) {
+                ctx.page.ifPresent { it.close() }
+                return
+            }
 
-        val player = store.getComponent(playerRef.reference!!, Player.getComponentType())?: return
+            val player = uiplayer.store.getComponent(uiplayer.playerRef.reference!!, Player.getComponentType())?: return
 
-        player.pageManager.openCustomPage(playerRef.reference!!, store, page)
+            player.pageManager.openCustomPage(uiplayer.playerRef.reference!!, uiplayer.store, uiplayer.lastUI)
+        }
     }
 }
