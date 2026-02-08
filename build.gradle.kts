@@ -20,7 +20,7 @@ repositories {
 dependencies {
     compileOnly(files("libs/HytaleServer.jar"))
 
-    implementation("curse.maven:hyui-1431415:7567866")
+    implementation("curse.maven:hyui-1431415:7593351")
 
     testImplementation(kotlin("test"))
 }
