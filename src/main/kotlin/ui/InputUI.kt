@@ -46,12 +46,12 @@ class InputUI(
                             .addChild(
                                 LabelBuilder.label()
                                     .withText(text)
+                                    .withPadding(HyUIPadding(10, 10, 20, 10))
                                     .withStyle(
                                         HyUIStyle()
                                             .setRenderBold(true)
-                                            .setAlignment(HyUIStyle.Alignment.Center)
+                                            .setAlignment(Alignment.Center)
                                     )
-                                    .withPadding(HyUIPadding(10, 10, 20, 10))
                             )
                             .addChild(
                                 TextFieldBuilder.textInput()
@@ -68,7 +68,7 @@ class InputUI(
                                     .withPadding(HyUIPadding(10, 10, 10, 10))
                                     .withStyle(
                                         HyUIStyle()
-                                            .setAlignment(HyUIStyle.Alignment.Center)
+                                            .setAlignment(Alignment.Center)
                                     )
                                     .addChild(
                                         ButtonBuilder.textButton()

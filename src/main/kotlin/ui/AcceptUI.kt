@@ -1,5 +1,6 @@
 ﻿package core.tastycake.ui
 
+import au.ellie.hyui.builders.Alignment
 import au.ellie.hyui.builders.ButtonBuilder
 import au.ellie.hyui.builders.ContainerBuilder
 import au.ellie.hyui.builders.GroupBuilder
@@ -55,7 +56,7 @@ class AcceptUI(
                                     .withStyle(
                                         HyUIStyle()
                                             .setRenderBold(true)
-                                            .setAlignment(HyUIStyle.Alignment.Center)
+                                            .setAlignment(Alignment.Center)
                                     )
                                     .withPadding(HyUIPadding(10, 10, 20, 10))
                             )
@@ -66,7 +67,7 @@ class AcceptUI(
                                     .withPadding(HyUIPadding(10, 10, 10, 10))
                                     .withStyle(
                                         HyUIStyle()
-                                            .setAlignment(HyUIStyle.Alignment.Center)
+                                            .setAlignment(Alignment.Center)
                                     )
                                     .addChild(
                                         ButtonBuilder.textButton()

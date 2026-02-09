@@ -3,25 +3,18 @@
 import au.ellie.hyui.builders.Alignment
 import au.ellie.hyui.builders.ButtonBuilder
 import au.ellie.hyui.builders.ContainerBuilder
+import au.ellie.hyui.builders.DropdownBoxBuilder
 import au.ellie.hyui.builders.GroupBuilder
 import au.ellie.hyui.builders.HyUIAnchor
 import au.ellie.hyui.builders.HyUIPadding
 import au.ellie.hyui.builders.HyUIStyle
-import au.ellie.hyui.builders.ItemGridBuilder
 import au.ellie.hyui.builders.LabelBuilder
 import au.ellie.hyui.builders.PageBuilder
-import au.ellie.hyui.builders.TextFieldBuilder
 import au.ellie.hyui.elements.LayoutModeSupported
-import au.ellie.hyui.events.SlotClickingEventData
-import au.ellie.hyui.events.UIContext
 import com.hypixel.hytale.component.Store
 import com.hypixel.hytale.protocol.packets.interface_.CustomPageLifetime
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType
-import com.hypixel.hytale.server.core.asset.type.item.config.Item
-import com.hypixel.hytale.server.core.entity.entities.Player
 import com.hypixel.hytale.server.core.entity.entities.player.pages.InteractiveCustomUIPage
-import com.hypixel.hytale.server.core.inventory.ItemStack
-import com.hypixel.hytale.server.core.ui.ItemGridSlot
 import com.hypixel.hytale.server.core.universe.PlayerRef
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore
 import core.tastycake.ui.runnables.InputCallback
@@ -29,48 +22,21 @@ import core.tastycake.ui.runnables.InputResult
 
 /**
  * @author TastyCake
- * @date 2/5/2026
+ * @date 2/8/2026
  */
 
-class ItemInputUI(
+class SelectOptionUI(
     val playerRef: PlayerRef,
     val store: Store<EntityStore>
 ) {
-    var currentGrid = mutableListOf<String>()
+    var selected = ""
 
-    var currentInput = ""
+    fun open(request: String = "", options: Array<String>, backMenu: InteractiveCustomUIPage<*>? = null, callback: InputCallback) {
+        val text = request.ifEmpty { "Select an option from below" }
 
-    var grid: ItemGridBuilder = ItemGridBuilder.itemGrid()
-        .withAnchor(HyUIAnchor().setWidth(900).setHeight(300))
-        .withShowScrollbar(true)
-        .withRenderItemQualityBackground(true)
-        .withSlotsPerRow(6)
-        .withHitTestVisible(false)
-        .withStyle(
-            HyUIStyle()
-                .set("SlotSpacing", 8)
-                .set("SlotSize", 100)
-        )
+        if (options.isEmpty()) return
 
-    fun buildGrid(filter: (ItemStack) -> Boolean = { true }) {
-        currentGrid.clear()
-        grid.slots.clear()
-
-        Item.getAssetMap().assetMap.forEach { (_, item) ->
-            if (item.id.isNotEmpty() && !item.id.contains(currentInput)) return@forEach
-            val stack = ItemStack(item.id)
-
-            if (!filter(stack)) return@forEach
-
-            currentGrid.add(stack.itemId)
-            grid.addSlot(
-                ItemGridSlot(stack)
-            )
-        }
-    }
-
-    fun open(filter: (ItemStack) -> Boolean = { true }, backMenu: InteractiveCustomUIPage<*>? = null, callback: InputCallback) {
-        buildGrid(filter)
+        selected = options[0]
 
         val player = UIPlayer(
             playerRef,
@@ -78,11 +44,13 @@ class ItemInputUI(
             backMenu,
         )
 
-        grid.addEventListenerWithContext(CustomUIEventBindingType.SlotClicking,
-            SlotClickingEventData::class.java) { slot, ctx ->
-            callback.result(currentGrid[slot.slotIndex], InputResult.COMPLETED)
+        val dropdown = DropdownBoxBuilder.dropdownBox()
+            .addEventListener(CustomUIEventBindingType.ValueChanged) { v ->
+                selected = v
+            }
 
-           InputUI.goBack(player, ctx)
+        options.forEach {
+            dropdown.addEntry(it, it)
         }
 
         val pageBuilder = PageBuilder
@@ -90,14 +58,14 @@ class ItemInputUI(
             .withLifetime(CustomPageLifetime.CantClose)
             .addElement(
                 ContainerBuilder.container()
-                        .withTitleText("Item request")
-                    .withAnchor(HyUIAnchor().setWidth(900).setHeight(500))
+                    .withTitleText("Waiting for your choice")
+                    .withAnchor(HyUIAnchor().setWidth(500).setHeight(250))
                     .addContentChild(
                         GroupBuilder.group()
                             .withLayoutMode(LayoutModeSupported.LayoutMode.Top)
                             .addChild(
                                 LabelBuilder.label()
-                                    .withText("Click on an item to select")
+                                    .withText(text)
                                     .withStyle(
                                         HyUIStyle()
                                             .setRenderBold(true)
@@ -106,27 +74,30 @@ class ItemInputUI(
                                     .withPadding(HyUIPadding(10, 10, 20, 10))
                             )
                             .addChild(
-                                grid
+                                GroupBuilder.group()
+                                    .withStyle(HyUIStyle()
+                                        .setAlignment(Alignment.Center))
+                                    .addChild(
+                                        dropdown
+                                    )
                             )
                             .addChild(
                                 GroupBuilder.group()
                                     .withFlexWeight(1)
                                     .withLayoutMode(LayoutModeSupported.LayoutMode.Center)
-                                    .withStyle(HyUIStyle().setAlignment(Alignment.Center))
-                                    .addChild(
-                                        LabelBuilder.label()
-                                            .withText("Search for item:")
-                                            .withAnchor(HyUIAnchor().setRight(5))
+                                    .withPadding(HyUIPadding(10, 10, 10, 10))
+                                    .withStyle(
+                                        HyUIStyle()
+                                            .setAlignment(Alignment.Center)
                                     )
                                     .addChild(
-                                        TextFieldBuilder.textInput()
-                                            .withAnchor(HyUIAnchor().setWidth(350).setHeight(40).setRight(15))
-                                            .withPadding(HyUIPadding(10, 10, 20, 10))
-                                            .addEventListenerWithContext(CustomUIEventBindingType.ValueChanged, String::class.java) { v, ctx ->
-                                                currentInput = v
-
-                                                buildGrid(filter)
-                                                ctx.updatePage(true)
+                                        ButtonBuilder.textButton()
+                                            .withAnchor(HyUIAnchor().setWidth(150).setHeight(40).setRight(20))
+                                            .withText("DONE")
+                                            .withPadding(HyUIPadding(0, 5, 0, 0))
+                                            .addEventListenerWithContext(CustomUIEventBindingType.Activating, Void::class.java) { _, ctx ->
+                                                callback.result(selected, InputResult.COMPLETED)
+                                                InputUI.goBack(player, ctx)
                                             }
                                     )
                                     .addChild(
@@ -135,13 +106,13 @@ class ItemInputUI(
                                             .withText("CANCEL")
                                             .withPadding(HyUIPadding(5, 0, 0, 0))
                                             .addEventListenerWithContext(CustomUIEventBindingType.Activating, Void::class.java) { _, ctx ->
-                                                callback.result(currentInput, InputResult.CANCELED)
+                                                callback.result("", InputResult.CANCELED)
                                                 InputUI.goBack(player, ctx)
                                             }
-                                        )
                                     )
                             )
                     )
+            )
 
         pageBuilder.open(store)
     }

@@ -1,6 +1,9 @@
 ﻿package core.tastycake.utils
 
 import com.hypixel.hytale.codec.Codec
+import com.hypixel.hytale.math.vector.Vector3d
+import com.hypixel.hytale.math.vector.Vector3f
+import com.hypixel.hytale.math.vector.Vector3i
 import core.tastycake.config.EasyConfig
 import core.tastycake.config.EasyConfigBuilder
 
@@ -10,6 +13,11 @@ import core.tastycake.config.EasyConfigBuilder
  */
 
 class Vector3(): EasyConfig() {
+    constructor(x: Double, y: Double, z: Double) : this() {
+        set("X", x)
+        set("Y", y)
+        set("Z", z)
+    }
 
     companion object {
         val CODEC = EasyConfigBuilder
@@ -19,4 +27,64 @@ class Vector3(): EasyConfig() {
             .addField("Z", Codec.DOUBLE)
             .build()
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Vector3) return false
+
+        val x1 = get<Double>("X")
+        val y1 = get<Double>("Y")
+        val z1 = get<Double>("Z")
+        val x2 = other.get<Double>("X")
+        val y2 = other.get<Double>("Y")
+        val z2 = other.get<Double>("Z")
+
+        return x1 == x2
+                && y1 == y2
+                && z1 == z2
+    }
+
+    override fun hashCode(): Int {
+        val x = get<Double>("X")
+        val y = get<Double>("Y")
+        val z = get<Double>("Z")
+
+        return arrayOf(x, y, z).contentHashCode()
+    }
+
+    fun toVector3i(): Vector3i {
+        val x = getOrDefault("X", 0.0)
+        val y = getOrDefault("Y", 0.0)
+        val z = getOrDefault("Z", 0.0)
+
+        return Vector3i(x.toInt(), y.toInt(), z.toInt())
+    }
+
+    fun toVector3d(): Vector3d {
+        val x = getOrDefault("X", 0.0)
+        val y = getOrDefault("Y", 0.0)
+        val z = getOrDefault("Z", 0.0)
+
+        return Vector3d(x, y, z)
+    }
+
+    fun toVector3f(): Vector3f {
+        val x = getOrDefault("X", 0.0)
+        val y = getOrDefault("Y", 0.0)
+        val z = getOrDefault("Z", 0.0)
+
+        return Vector3f(x.toFloat(), y.toFloat(), z.toFloat())
+    }
+}
+
+fun Vector3i.toVector3(): Vector3 {
+    return Vector3(x.toDouble(), y.toDouble(), z.toDouble())
+}
+
+fun Vector3d.toVector3(): Vector3 {
+    return Vector3(x, y, z)
+}
+
+fun Vector3f.toVector3(): Vector3 {
+    return Vector3(x.toDouble(), y.toDouble(), z.toDouble())
 }

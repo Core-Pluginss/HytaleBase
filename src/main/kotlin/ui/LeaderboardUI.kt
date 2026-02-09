@@ -171,7 +171,7 @@ class LeaderboardUI(
                                             .setRenderBold(true)
                                             .setFontSize(if (rank == 1) 28f else 22f)
                                             .setTextColor(accent)
-                                            .setAlignment(HyUIStyle.Alignment.Center)
+                                            .setAlignment(Alignment.Center)
                                     )
                             )
                             .addChild(
@@ -182,7 +182,7 @@ class LeaderboardUI(
                                             .setRenderBold(true)
                                             .setFontSize(if (rank == 1) 16f else 15f)
                                             .setTextColor("#EAF2FF")
-                                            .setAlignment(HyUIStyle.Alignment.Center)
+                                            .setAlignment(Alignment.Center)
                                     )
                             )
                             .addChild(
@@ -192,7 +192,7 @@ class LeaderboardUI(
                                         HyUIStyle()
                                             .setFontSize(14f)
                                             .setTextColor("#A7B1C6")
-                                            .setAlignment(HyUIStyle.Alignment.Center)
+                                            .setAlignment(Alignment.Center)
                                     )
                             )
                     )

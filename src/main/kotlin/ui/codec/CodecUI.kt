@@ -20,7 +20,7 @@ import core.tastycake.utils.Vector3
  * @date 2/5/2026
  */
 
-class CodecUI<T: EasyConfig>(
+open class CodecUI<T: EasyConfig>(
     val label: String,
     val obj: T,
     val save: () -> Unit = {}
@@ -34,30 +34,49 @@ class CodecUI<T: EasyConfig>(
         return this
     }
 
-    fun fillFields(): CodecUI<T> {
+    fun fillFields(vararg exceptions: String): CodecUI<T> {
         obj.data.forEach { (key, value) ->
-            val type = if (value is ItemStack) FieldType.ITEM else FieldType.TEXT
+            if (exceptions.contains(key)) return@forEach
+
+            val type = if (value == null) FieldType.TEXT else FieldType.getCorrectType(value::class.java)
             val field = Field(
                 key,
                 type,
-                { value, variable ->
+                { value, variable, cast ->
+                    var old = obj.get<Any>(key)
 
-                    if (variable.isEmpty()) obj.set(key, (obj.getOrDefault(key, value)!!::class.java).cast(value))
+                    old = if (old != null && old::class.java.isArray) {
+                        var t = (old as Array<String>)
+
+                        if (t.contains(value)) t = t.filter { it != value }.toTypedArray()
+                        else {
+                            t += value
+                        }
+
+                        t
+                    } else {
+                        try {
+                            cast.invoke(value)
+                        } catch (ignore: Exception) {
+                            return@Field
+                        }
+                    }
+
+                    println(old.toString())
+
+                    if (variable.isEmpty()) obj.set(key, old)
                     else {
                         val o = obj.get<EasyConfig>(key)
-                        o?.set(variable, (o.getOrDefault(variable, value)!!::class.java).cast(value))
+                        o?.set(variable, old)
                     }
                 },
                 {
                     value?.let {
-                        when (it) {
-                            is ItemStack ->
-                                obj.get(key, ItemStack::class.java)?.itemId ?: ""
-                            is Vector3 ->
-                                obj.get(key, Vector3::class.java)?: Vector3()
-                            else ->
-                                obj.get(key, it::class.java)?.toString() ?: ""
-                        }
+                        type.getter.invoke(
+                            obj,
+                            key,
+                            it::class.java
+                        )
                     } ?: ""
                 }
             )
@@ -92,12 +111,12 @@ class CodecUI<T: EasyConfig>(
                 .addChild(
                     GroupBuilder.group()
                         .withLayoutMode(LayoutModeSupported.LayoutMode.Left)
-                        .withAnchor(HyUIAnchor().setBottom(20))
-                        .addChild(
-                            LabelBuilder.label()
-                                .withText("${it.key}:")
-                                .withAnchor(HyUIAnchor().setRight(10))
-                        )
+                        .withAnchor(HyUIAnchor().setBottom(10))
+//                        .addChild(
+//                            LabelBuilder.label()
+//                                .withText("${it.key}:")
+//                                .withAnchor(HyUIAnchor().setRight(10))
+//                        )
                         .addChild(
                             it.getGroup(UIPlayer(playerRef, store, page))
                         )

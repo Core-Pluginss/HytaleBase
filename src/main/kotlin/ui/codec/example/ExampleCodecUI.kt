@@ -19,6 +19,7 @@ class ExampleCodecUI(
 ) {
 //    var ui: CodecUI<ExampleConfig> = CodecUI(
 //        "Example",
+//        (EasyConfig) T,
 //        // Main.CONFIG.get()
 //    ) {
 //        // Main.CONFIG.save()

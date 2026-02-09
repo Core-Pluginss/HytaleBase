@@ -1,5 +1,7 @@
 ﻿package core.tastycake.config
 
+import com.hypixel.hytale.server.core.util.Config
+
 /**
  * @author TastyCake
  * @date 2/5/2026
@@ -21,7 +23,19 @@ open class EasyConfig(
         return clazz.cast(r)
     }
 
-    fun <T> getOrDefault(key: String, default: T?): T? {
+    fun <T> getNonNull(key: String): T {
+        val r = data.getOrDefault(key, null)!!
+
+        return r as T
+    }
+
+    fun <T> getNonNull(key: String, clazz: Class<T>): T {
+        val r = data.getOrDefault(key, null)!!
+
+        return clazz.cast(r)
+    }
+
+    fun <T> getOrDefault(key: String, default: T): T {
         val r = data.getOrDefault(key, null) ?: return default
 
         return r as T
@@ -37,6 +51,33 @@ open class EasyConfig(
         data[key] = value
 
         return this
+    }
+
+    inline fun <reified T: EasyConfig, V> getOrNew(key: String,
+                                                   value: V,
+                                                   arrayKey: String,
+                                                   config: Config<*>): T {
+        var array = getOrDefault<Array<T>>(arrayKey, arrayOf())
+
+        var data = array.firstOrNull { it.get<V>(key) == value }
+
+        if (data == null) {
+            data = T::class.java.newInstance()
+            data.set(key, value)
+            data.applyDefaults()
+
+            array += data
+
+            set(arrayKey, array)
+
+            config.save()
+        }
+
+        return data
+    }
+
+    open fun applyDefaults() {
+
     }
 
     fun <T: EasyConfig> build(): T {

@@ -1,5 +1,6 @@
 ﻿package core.tastycake.ui.codec
 
+import au.ellie.hyui.builders.Alignment
 import au.ellie.hyui.builders.GroupBuilder
 import au.ellie.hyui.builders.HyUIAnchor
 import au.ellie.hyui.builders.HyUIStyle
@@ -16,30 +17,41 @@ import core.tastycake.ui.runnables.FieldInputCallback
 class Field(
     val key: String,
     val fieldType: FieldType,
-    val setter: (String, String) -> Unit,
+    val setter: (String, String, (String) -> Any) -> Unit,
     val getter: () -> Any,
     var update: () -> Unit = {}
 ) {
     fun getGroup(player: UIPlayer): GroupBuilder {
+        val regex = Regex("""^([A-Za-z]+)(\d+)(.+)$""")
+        val match = regex.matchEntire(key)
+
+        var fixedKey = key
+
+        if (match != null) {
+            fixedKey = match.groupValues[1]
+        }
+
         return GroupBuilder.group()
             .withFlexWeight(1)
             .withLayoutMode(LayoutModeSupported.LayoutMode.Left)
             .addChild(
                 LabelBuilder.label()
-                    .withText(key)
+                    .withText(fixedKey)
                     .withStyle(
                         HyUIStyle()
                             .setRenderBold(true)
-                            .setAlignment(HyUIStyle.Alignment.Center)
+                            .setAlignment(Alignment.Center)
                     )
                     .withAnchor(HyUIAnchor().setRight(5))
             )
             .addChild(
-                fieldType.group.invoke(getter.invoke(),
+                fieldType.group.invoke(
+                    key,
+                    getter.invoke(),
                     player,
                     object : FieldInputCallback {
                         override fun input(input: String, variable: String) {
-                            setter.invoke(input, variable)
+                            setter.invoke(input, variable, fieldType.cast)
 
                             update.invoke()
                         }
