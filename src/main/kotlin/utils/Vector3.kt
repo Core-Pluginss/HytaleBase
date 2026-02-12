@@ -12,7 +12,13 @@ import core.tastycake.config.EasyConfigBuilder
  * @date 2/7/2026
  */
 
-class Vector3(): EasyConfig() {
+class Vector3(): EasyConfig(), Cloneable {
+    init {
+        set("X", 0.0)
+        set("Y", 0.0)
+        set("Z", 0.0)
+    }
+
     constructor(x: Double, y: Double, z: Double) : this() {
         set("X", x)
         set("Y", y)
@@ -52,6 +58,18 @@ class Vector3(): EasyConfig() {
         return arrayOf(x, y, z).contentHashCode()
     }
 
+    fun add(x: Double, y: Double, z: Double): Vector3 {
+        val oldX = getOrDefault("X", 0.0)
+        val oldY = getOrDefault("Y", 0.0)
+        val oldZ = getOrDefault("Z", 0.0)
+
+        set("X", oldX + x)
+        set("Y", oldY + y)
+        set("Z", oldZ + z)
+
+        return this
+    }
+
     fun toVector3i(): Vector3i {
         val x = getOrDefault("X", 0.0)
         val y = getOrDefault("Y", 0.0)
@@ -74,6 +92,14 @@ class Vector3(): EasyConfig() {
         val z = getOrDefault("Z", 0.0)
 
         return Vector3f(x.toFloat(), y.toFloat(), z.toFloat())
+    }
+
+    public override fun clone(): Vector3 {
+        val x = getOrDefault("X", 0.0)
+        val y = getOrDefault("Y", 0.0)
+        val z = getOrDefault("Z", 0.0)
+
+        return Vector3(x, y, z)
     }
 }
 

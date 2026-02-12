@@ -11,6 +11,10 @@ import com.hypixel.hytale.server.core.util.Config
 open class EasyConfig(
     val data: MutableMap<String, Any?> = mutableMapOf(),
 ) {
+    init {
+        applyDefaults()
+    }
+
     fun <T> get(key: String): T? {
         val r = data.getOrDefault(key, null) ?: return null
 

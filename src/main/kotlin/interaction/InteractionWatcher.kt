@@ -25,8 +25,6 @@ class InteractionWatcher : PacketWatcher {
         val chain = packet.updates[0]
         val chainData = chain.data as? InteractionChainData ?: return
 
-        if (chain.interactionType != InteractionType.Primary) return
-
         val playerRef = packetHandler.playerRef
         val worldUuid = playerRef.worldUuid ?: return
 

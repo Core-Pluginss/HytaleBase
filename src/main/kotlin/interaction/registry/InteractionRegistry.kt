@@ -8,8 +8,10 @@
 object InteractionRegistry {
     private val registrations = mutableListOf<InteractionRegistration>()
 
-    public fun register(registration: InteractionRegistration) {
+    public fun register(registration: InteractionRegistration): InteractionRegistry {
         registrations.add(registration)
+
+        return this
     }
 
     public fun getRegistrations() : Set<InteractionRegistration> {
