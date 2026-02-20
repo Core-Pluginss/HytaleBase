@@ -70,6 +70,10 @@ class Vector3(): EasyConfig(), Cloneable {
         return this
     }
 
+    fun distance(other: Vector3): Double {
+        return toVector3d().distanceTo(other.toVector3d())
+    }
+
     fun toVector3i(): Vector3i {
         val x = getOrDefault("X", 0.0)
         val y = getOrDefault("Y", 0.0)
