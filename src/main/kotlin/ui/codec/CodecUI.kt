@@ -62,8 +62,6 @@ open class CodecUI<T: EasyConfig>(
                         }
                     }
 
-                    println(old.toString())
-
                     if (variable.isEmpty()) obj.set(key, old)
                     else {
                         val o = obj.get<EasyConfig>(key)
