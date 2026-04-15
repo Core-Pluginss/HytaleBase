@@ -1,7 +1,7 @@
 # HytaleBase
-Usage:
+Use in your project:
 - Step 1:
-   Clone this project and build it - `gradle clean build`
+   Clone this project and build it - `gradle clean build` or go to https://github.com/Core-Pluginss/HytaleBase/releases and download the latest
 - Step 2:
     In your plugin's `build.gradle.kts` modify the repositories and dependencies:
 ```gradle
@@ -17,6 +17,8 @@ dependencies {
     // No need for HytaleServer.jar, its included in HytaleBase.
 
     implementation("core.tastycake:hytale-base:lts") // <-- Add this
+    // or
+    implementation(files("path/to/jar"))
     
     // ... All your other dependencies
 }
